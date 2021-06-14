@@ -1,3 +1,5 @@
+import {errorLogger} from "../utils/error-logger";
+
 const axios = require('axios').default;
 const config = {
   url: 'https://open-genes.com/api'
@@ -10,7 +12,7 @@ export function getGenesList(populateData) {
       populateData(res.data);
     })
     .catch((err) => {
-      console.error(err);
+      errorLogger(err);
     });
 }
 

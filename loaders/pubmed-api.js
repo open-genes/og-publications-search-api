@@ -6,7 +6,7 @@ const config = {
 };
 
 // TODO: DRY with a common class and constructor
-export function getPubmedPublicationsList(populateData, symbolsList, limit) {
+export function getPublicationsIdList(symbolsList, limit, populateData) {
   let symbolsQuery = '';
   symbolsList.forEach((gene, index, array) => {
     symbolsQuery += `${gene}[Title]`;
@@ -18,14 +18,14 @@ export function getPubmedPublicationsList(populateData, symbolsList, limit) {
       config.params
     }&retmax=${limit}&term=${symbolsQuery}&datetype=pdat&reldate=180`)
     .then((res) => {
-      populateData(res.data);
+      populateData(res.data.esearchresult.idlist);
     })
     .catch((err) => errorLogger(err));
 }
 
-export function getPubmedPublication(populateData) {
+export function getPublicationsInIdsList(idlist, populateData) {
   axios
-    .get(`${config.url}/esummary.fcgi?${config.params}&id=${id}`)
+    .get(`${config.url}/esummary.fcgi?${config.params}&id=${idlist}`)
     .then((res) => {
       populateData(res.data);
     })
