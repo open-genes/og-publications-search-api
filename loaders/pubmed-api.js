@@ -6,18 +6,18 @@ const config = {
 };
 
 // TODO: DRY with a common class and constructor
-export function getPubmedPublicationsList(populateData, symbols, limit) {
+export function getPubmedPublicationsList(populateData, symbolsList, limit = 0) {
   axios
     .get(`${config.url}/esearch.fcgi?${
       config.params
-    }&retmax=${limit}&term=${symbols}&datetype=pdat&reldate=180`)
+    }&retmax=${limit}&term=${symbolsList}&datetype=pdat&reldate=180`)
     .then((res) => {
       populateData(res.data);
     })
     .catch((err) => errorLogger(err));
 }
 
-export function getPubmedPublicationsList(populateData) {
+export function getPubmedPublication(populateData) {
   axios
     .get(`${config.url}/esummary.fcgi?${config.params}&id=${id}`)
     .then((res) => {
