@@ -52,7 +52,8 @@ app.post('/publication/all', (req, res) => {
             }
           );
 
-
+          // console.log('query');
+          res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
           res.json(filteredFeed);
         })
     })
