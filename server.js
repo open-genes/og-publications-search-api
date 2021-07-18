@@ -18,12 +18,14 @@ app.post('/publication/all', (req, res) => {
     });
 
     getPublicationsIdList(
-      req.body.symbols?.length !== 0
+      typeof req.body.symbols !== undefined  && req.body.symbols.length !== 0
         ? req.body.symbols
         : geneSymbolsList,
       req.body.limit,
       (data) => {
       const publicationIdsList = data;
+
+      console.log(req.body.symbols);
 
       getPublicationsInIdsList(
         publicationIdsList,
