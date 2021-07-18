@@ -18,7 +18,7 @@ app.post('/publication/all', (req, res) => {
     });
 
     getPublicationsIdList(
-      req.body.symbols.length !== 0
+      req.body.symbols?.length !== 0
         ? req.body.symbols
         : geneSymbolsList,
       req.body.limit,
