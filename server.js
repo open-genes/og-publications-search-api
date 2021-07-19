@@ -1,9 +1,13 @@
 import {getGenesList} from "./loaders/open-genes-api";
 import {getPublicationsIdList, getPublicationsInIdsList} from "./loaders/pubmed-api";
+
 const express = require('express');
 const app = express();
 const port = 8080;
-const bodyParser = require('body-parser')
+const cors = require('cors');
+const bodyParser = require('body-parser');
+
+app.use(cors());
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -11,73 +15,66 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 app.post('/publication/all', (req, res) => {
-  getGenesList((data) => {
-    let geneSymbolsList = [];
-    data.forEach((data) => {
-      geneSymbolsList.push(data.symbol.toLowerCase());
-    });
-
-    getPublicationsIdList(
-      typeof req.body.symbols !== undefined  && req.body.symbols.length !== 0
-        ? req.body.symbols
-        : geneSymbolsList,
-      req.body.limit,
-      (data) => {
-      const publicationIdsList = data;
-
-      console.log(req.body.symbols);
-
-      getPublicationsInIdsList(
-        publicationIdsList,
+  if (Object.keys(req.body).length !== 0) {
+    getGenesList((data) => {
+      let geneSymbolsList = [];
+      data.forEach((data) => {
+        geneSymbolsList.push(data.symbol.toLowerCase());
+      });
+      console.log(req.body);
+      getPublicationsIdList(
+        req.body.symbols !== undefined
+          ? req.body.symbols :
+          geneSymbolsList,
+        req.body.limit !== undefined
+          ? req.body.limit
+          : 0,
         (data) => {
-          // Form an article object and a feed list
-          const feed = [];
-          Object.values(data.result).forEach((article) => {
-            feed.push({
-              uid: article.uid,
-              url: `https://www.ncbi.nlm.nih.gov/pubmed/${article.uid}`,
-              title: article.title,
-              sortTitle: article.sorttitle,
-              date: article.pubdate,
-            });
-          });
+          const publicationIdsList = data;
+          console.log(req.body.symbols);
 
-          // Check if gene symbol is mentioned in the title of an article
-          const filteredFeed = feed.map(
-            (article) => {
-              const re = new RegExp(`${geneSymbolsList.join("|")}/gmi`);
-              const match = re.exec(article.sortTitle);
+          getPublicationsInIdsList(
+            publicationIdsList,
+            (data) => {
+              // Form an article object and a feed list
+              const feed = [];
+              Object.values(data.result).forEach((article) => {
+                feed.push({
+                  uid: article.uid,
+                  url: `https://www.ncbi.nlm.nih.gov/pubmed/${article.uid}`,
+                  title: article.title,
+                  sortTitle: article.sorttitle,
+                  date: article.pubdate,
+                });
+              });
 
-              if (match !== null) {
-                return {
-                  gene: match[0],
-                  ...article
-                };
-              }
+              // Check if gene symbol is mentioned in the title of an article
+              const filteredFeed = feed.map(
+                (article) => {
+                  const re = new RegExp(`${geneSymbolsList.join("|")}/gmi`);
+                  const match = re.exec(article.sortTitle);
 
-              return article;
-            }
-          );
+                  if (match !== null) {
+                    return {
+                      gene: match[0],
+                      ...article
+                    };
+                  }
 
-          // Website you wish to allow to connect
-          res.header('Access-Control-Allow-Origin', '*');
+                  return article;
+                }
+              );
 
-          // Request methods you wish to allow
-          res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-
-          // Request headers you wish to allow
-          res.header('Access-Control-Allow-Headers', 'origin, content-type, accept');
-
-          // Set to true if you need the website to include cookies in the requests sent
-          // to the API (e.g. in case you use sessions)
-          res.header('Access-Control-Allow-Credentials', true);
-
-          res.json(filteredFeed);
+              res.json(filteredFeed);
+            })
         })
-    })
-  });
+    });
+  } else {
+    console.log(req.body);
+    res.sendStatus(500);
+  }
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`Example app listening at http://localhost:${port}`);
 });
