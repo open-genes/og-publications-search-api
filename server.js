@@ -63,7 +63,7 @@ app.post('/publication/all', (req, res) => {
           res.header('Access-Control-Allow-Origin', '*');
 
           // Request methods you wish to allow
-          res.header('Access-Control-Allow-Methods', 'GET, POST');
+          res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 
           // Request headers you wish to allow
           res.header('Access-Control-Allow-Headers', 'origin, content-type, accept');
