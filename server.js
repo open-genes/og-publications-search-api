@@ -65,23 +65,7 @@ app.post('/publication/all', (req, res) => {
                 }
               );
 
-              const page = req.body.page !== undefined
-                ? req.body.page
-                : 1;
-              const limit = req.body.limit !== undefined
-                ? req.body.limit
-                : 1;
-              const portion = 10;
-              const startIndex = (page - 1) * portion;
-              const endIndex = page * portion;
-
-              try {
-                const result = filteredFeed.slice(startIndex, endIndex);
-                res.json(result);
-              } catch (err) {
-                console.log(err);
-                res.sendStatus(500);
-              }
+              res.json(filteredFeed);
             })
         })
     });
