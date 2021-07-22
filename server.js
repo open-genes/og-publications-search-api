@@ -39,14 +39,27 @@ app.post('/publication/all', (req, res) => {
               // Form an article object and a feed list
               const feed = [];
               Object.values(data.result).forEach((article) => {
-                feed.push({
-                  uid: article.uid,
-                  url: `https://www.ncbi.nlm.nih.gov/pubmed/${article.uid}`,
-                  title: article.title,
-                  sortTitle: article.sorttitle,
-                  date: article.pubdate,
-                });
+                /* structure:
+                  [
+                    { ...article },
+                    { ...article },
+                    [ '33733001', '33650673' ]
+                  ]
+                */
+                console.log(article);
+
+                if (article.hasOwnProperty('uid')) {
+                  feed.push({
+                    uid: article.uid,
+                    url: `https://www.ncbi.nlm.nih.gov/pubmed/${article.uid}`,
+                    title: article.title,
+                    sortTitle: article.sorttitle,
+                    date: article.pubdate,
+                  });
+                }
               });
+
+              console.log(feed);
 
               // Check if gene symbol is mentioned in the title of an article
               const filteredFeed = feed.map(
@@ -68,12 +81,9 @@ app.post('/publication/all', (req, res) => {
               const page = req.body.page !== undefined
                 ? req.body.page
                 : 1;
-              const limit = req.body.limit !== undefined
-                ? req.body.limit
-                : 1;
               const portion = 10;
               const startIndex = (page - 1) * portion;
-              const endIndex = page * portion;
+              const endIndex = startIndex + portion;
 
               try {
                 const result = filteredFeed.slice(startIndex, endIndex);
