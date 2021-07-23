@@ -89,6 +89,7 @@ app.post('/publication/all', (req, res) => {
 
                 console.log(
                   `\n--- New search --- \n`,
+                  `total: ${filteredFeed.length} \n`,
                   `symbols:${req.body.symbols} \n`,
                   `limit: ${req.body.limit} \n`,
                   `page: ${req.body.page} of ${filteredFeed.length / portion}`
