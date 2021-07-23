@@ -21,7 +21,6 @@ app.post('/publication/all', (req, res) => {
       data.forEach((data) => {
         geneSymbolsList.push(data.symbol.toLowerCase());
       });
-      console.log(req.body);
       getPublicationsIdList(
         req.body.symbols !== undefined
           ? req.body.symbols :
@@ -31,7 +30,6 @@ app.post('/publication/all', (req, res) => {
           : 0,
         (data) => {
           const publicationIdsList = data;
-          console.log(req.body.symbols);
 
           getPublicationsInIdsList(
             publicationIdsList,
@@ -46,7 +44,6 @@ app.post('/publication/all', (req, res) => {
                     [ '33733001', '33650673' ]
                   ]
                 */
-                console.log(article);
 
                 if (article.hasOwnProperty('uid')) {
                   feed.push({
@@ -58,8 +55,6 @@ app.post('/publication/all', (req, res) => {
                   });
                 }
               });
-
-              console.log(feed);
 
               // Check if gene symbol is mentioned in the title of an article
               const filteredFeed = feed.map(
@@ -86,8 +81,18 @@ app.post('/publication/all', (req, res) => {
               const endIndex = startIndex + portion;
 
               try {
-                const result = filteredFeed.slice(startIndex, endIndex);
+                const result = {
+                  total: filteredFeed.length,
+                  items: [...filteredFeed.slice(startIndex, endIndex)],
+                };
                 res.json(result);
+
+                console.log(
+                  `\n--- New search --- \n`,
+                  `symbols:${req.body.symbols} \n`,
+                  `limit: ${req.body.limit} \n`,
+                  `page: ${req.body.page} of ${filteredFeed.length / portion}`
+                );
               } catch (err) {
                 console.log(err);
                 res.sendStatus(500);
