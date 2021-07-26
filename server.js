@@ -51,7 +51,7 @@ app.post('/publication/all', (req, res) => {
                     url: `https://www.ncbi.nlm.nih.gov/pubmed/${article.uid}`,
                     title: article.title,
                     sortTitle: article.sorttitle,
-                    date: article.pubdate,
+                    date: new Date(article.pubdate).getTime(),
                   });
                 }
               });
