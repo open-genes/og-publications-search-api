@@ -12,7 +12,7 @@ npm run start
 http://localhost:8080
 
 ## Deployment
-Every push to master runs a deployment to Digital Ocean apps storage.
+Every push to master runs a deployment to Digital Ocean App Platform.
 
 ## Endpoints
 
@@ -21,8 +21,9 @@ Every push to master runs a deployment to Digital Ocean apps storage.
 
 ```
 {
-    "symbols": <string[]>,
-    "limit": <number>
+    "symbols": <string[]>,  (required)
+    "limit": <number>       (required)
+    "page": <number>        (optional)
 }
 ```
 
@@ -30,20 +31,32 @@ Every push to master runs a deployment to Digital Ocean apps storage.
 ```json
 {
     "symbols": ["IL15RA", "APOC3"],
-    "limit": 2
+    "limit": 2,
+    "page": 1
 }
 ```
 
-Returns a list of the publications found for all of the genes in the database. <br>If `limit` is set to `0`, there is no limit for publications in response. |
+Returns a list of the publications found for all of the genes in the database.
+
+If `symbols` array is empty, an app will create its own genes list. <br>
+If `limit` is set to `0`, an app will set it to default — `10`. <br>
+Esummary API returns error when there is no limit specified.
+
 
 ##### Response example:
 ```json
-[
-    {
-        "uid": "34102208",
-        "url": "https://www.ncbi.nlm.nih.gov/pubmed/34102208",
-        "title": "N-acetylcysteine alleviates ocular surface damage in STZ-induced diabetic mice by inhibiting the ROS/NLRP3/Caspase-1/IL-1β signaling pathway.",
-        "date": "2021 Jun 5"
-    }
-]
+{
+    "total": 1,
+    "page": 1,
+    "items": [
+        {
+            "gene": "stat3",
+            "uid": "34141151",
+            "url": "https://www.ncbi.nlm.nih.gov/pubmed/34141151",
+            "title": "Promotion effects of DEHP on hepatocellular carcinoma models: up-regulation of PD-L1 by activating the JAK2/STAT3 pathway.",
+            "sortTitle": "promotion effects of dehp on hepatocellular carcinoma models up regulation of pd l1 by activating the jak2 stat3 pathway",
+            "date": 1619816400000
+        }
+  ]
+}
 ```
