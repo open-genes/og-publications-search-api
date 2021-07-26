@@ -85,7 +85,7 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
 
               // Check if gene symbol is mentioned in the title of an article.
               // Exclude them from response if not.
-              const filteredFeed = feed.filter(
+              const filteredFeed = feed.map(
                 (article) => {
                   const re = new RegExp(`${geneSymbolsList.join("|")}/gmi`);
                   const match = re.exec(article.sortTitle);
@@ -100,15 +100,16 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
               );
 
               const page = req.body.page !== undefined
-                ? req.body.page
+                ? Math.ceil(req.body.page)
                 : 1;
               const portion = 10;
-              const startIndex = (page - 1) * portion;
+              const startIndex = Math.ceil((page - 1) * portion);
               const endIndex = startIndex + portion;
 
               try {
                 const result = {
                   total: filteredFeed.length,
+                  page: page,
                   items: [...filteredFeed.slice(startIndex, endIndex)],
                 };
                 res.json(result);
@@ -118,7 +119,7 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                   `total: ${filteredFeed.length} \n`,
                   `symbols:${req.body.symbols} \n`,
                   `limit: ${req.body.limit} \n`,
-                  `page: ${req.body.page} of ${filteredFeed.length / portion}`
+                  `page: ${req.body.page} of ${Math.ceil(filteredFeed.length / portion)}`
                 );
               } catch (err) {
                 console.log(err);
