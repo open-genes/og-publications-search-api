@@ -6,6 +6,8 @@ const app = express();
 const port = 8080;
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cache = require('memory-cache');
+const crypto = require('crypto')
 
 app.use(cors());
 
@@ -14,7 +16,32 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 
-app.post('/publication/all', (req, res) => {
+// Configure cache middleware
+let memCache = new cache.Cache();
+let cacheMiddleware = (duration) => {
+  return (req, res, next) => {
+    const currentDate = (new Date()).valueOf().toString();
+    const random = Math.random().toString();
+    const hash = crypto.createHash('md5').update(`${currentDate}${random}`).digest("hex");
+    let key =  `__search__${hash}`;
+    let cacheContent = memCache.get(key);
+    if(cacheContent){
+      res.send( cacheContent );
+      return
+    }else{
+      res.sendResponse = res.send
+      res.send = (body) => {
+        memCache.put(key,body,duration * 1000);
+        res.sendResponse(body)
+      }
+      next()
+    }
+  }
+}
+
+// App routes
+// TODO: transfer all the logic into the module
+app.post('/publication/all', cacheMiddleware(30), (req, res) => {
   if (Object.keys(req.body).length !== 0) {
     getGenesList((data) => {
       let geneSymbolsList = [];
@@ -56,7 +83,8 @@ app.post('/publication/all', (req, res) => {
                 }
               });
 
-              // Check if gene symbol is mentioned in the title of an article
+              // Check if gene symbol is mentioned in the title of an article.
+              // Exclude them from response if not.
               const filteredFeed = feed.filter(
                 (article) => {
                   const re = new RegExp(`${geneSymbolsList.join("|")}/gmi`);
@@ -107,6 +135,7 @@ app.post('/publication/all', (req, res) => {
   }
 });
 
+// Runtime logs
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
