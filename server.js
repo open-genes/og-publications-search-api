@@ -96,8 +96,6 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                       ...article
                     };
                   }
-
-                  return article;
                 }
               );
 
