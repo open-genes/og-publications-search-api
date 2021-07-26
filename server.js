@@ -57,7 +57,7 @@ app.post('/publication/all', (req, res) => {
               });
 
               // Check if gene symbol is mentioned in the title of an article
-              const filteredFeed = feed.map(
+              const filteredFeed = feed.filter(
                 (article) => {
                   const re = new RegExp(`${geneSymbolsList.join("|")}/gmi`);
                   const match = re.exec(article.sortTitle);
