@@ -85,11 +85,10 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
 
               // Check if gene symbol is mentioned in the title of an article.
               // Exclude them from response if not.
-              const filteredFeed = feed.map(
+              const filteredFeed = feed.filter(
                 (article) => {
                   const re = new RegExp(`${geneSymbolsList.join("|")}/gmi`);
                   const match = re.exec(article.sortTitle);
-
                   if (match !== null) {
                     return {
                       gene: match[0],
@@ -98,6 +97,8 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                   }
                 }
               );
+
+              console.log(filteredFeed);
 
               const page = req.body.page !== undefined
                 ? Math.ceil(req.body.page)
