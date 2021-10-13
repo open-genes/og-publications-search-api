@@ -1,4 +1,4 @@
-import {getGenesList} from "./loaders/open-genes-api";
+import {getArticleDataByDoi, getGenesList} from "./loaders/open-genes-api";
 import {getPublicationsIdList, getPublicationsInIdsList} from "./loaders/pubmed-api";
 import {errorLogger} from "./utils/error-logger";
 
@@ -158,6 +158,17 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
     errorLogger(500);
   }
 });
+
+app.post('/articleData', cacheMiddleware(30), (req, res) => {
+  const doi = req.body.doi;
+  console.log(req.body)
+  if(doi) {
+    getArticleDataByDoi(doi, (article) => res.json(article))
+  } else {
+    errorLogger(500);
+  }
+
+})
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
