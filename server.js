@@ -159,15 +159,13 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
   }
 });
 
-app.post('/articleData', cacheMiddleware(30), (req, res) => {
-  const doi = req.body.doi;
-  console.log(req.body)
+app.get('/articleData', cacheMiddleware(30), (req, res) => {
+  const doi = req.query.doi;
   if(doi) {
     getArticleDataByDoi(doi, (article) => res.json(article))
   } else {
     errorLogger(500);
   }
-
 })
 
 app.listen(port, () => {
