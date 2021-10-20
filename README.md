@@ -75,9 +75,6 @@ Returns a scientific publication metadata by DOI.
 ##### Response example:
 
 ```json
-// 20211020151213
-// https://publications-search-api-2yf55.ondigitalocean.app/publication/getInfoByDOI/?doi=10.1093/gerona/glx257
-
 {
   "identifier": {
     "pmid": [
