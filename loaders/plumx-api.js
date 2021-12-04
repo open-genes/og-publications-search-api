@@ -7,7 +7,7 @@ const config = {
 
 export function getArticleDataByDoi(doi, article) {
     axios
-        .get(`${config.doiUrl}/${doi}`)
+        .get(`${config.url}/${doi}`)
         .then((res) => article(res.data))
         .catch((err) => {
             errorLogger(err);
