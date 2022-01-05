@@ -55,13 +55,24 @@ let cacheMiddleware = (duration) => {
 // TODO: transfer all the logic into the module
 app.post('/publication/all', cacheMiddleware(30), (req, res) => {
     if (Object.keys(req.body).length !== 0) {
+        const symbols = req.body.symbols !== undefined
+            ? req.body.symbols :
+            geneSymbolsList;
+        const keywords = req.body.keywords !== undefined
+            ? req.body.keywords :
+            ['aging'];
         const portion = 10;
         const limit = req.body.limit !== undefined
             ? req.body.limit
             : portion;
-        const page = req.body.page !== undefined
-            ? Math.ceil(req.body.page)
-            : 1;
+        let page = 1;
+        if (req.body.page !== undefined) {
+            if (!Number.isSafeInteger(page) || page === 0) {
+                page = 1;
+            } else {
+                page =req.body.page;
+            }
+        }
 
         getGenesList((data) => {
             let geneSymbolsList = [];
@@ -69,9 +80,8 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                 geneSymbolsList.push(data.symbol.toLowerCase());
             });
             getPublicationsIdList(
-                req.body.symbols !== undefined
-                    ? req.body.symbols :
-                    geneSymbolsList,
+                symbols,
+                keywords,
                 limit,
                 (data) => {
                     console.log(limit, page);
@@ -142,7 +152,8 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                                     console.log(
                                         `\n--- New search --- \n`,
                                         `total: ${filteredFeed.length} \n`,
-                                        `symbols:${req.body.symbols} \n`,
+                                        `symbols:${symbols} \n`,
+                                        `keywords:${keywords} \n`,
                                         `limit: ${limit} \n`,
                                         `page: ${page} of ${Math.ceil(filteredFeed.length / portion)}`
                                     );

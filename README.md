@@ -19,28 +19,35 @@ Every push to master runs a deployment to Digital Ocean App Platform.
 **`POST` [/publication/all](https://publications-search-api-2yf55.ondigitalocean.app/publication/all)**
 <br>`raw`&nbsp;`JSON` 
 
-```
-{
-    "symbols": <string[]>,  (required)
-    "limit": <number>       (required)
-    "page": <number>        (optional)
-}
-```
+Returns a list of the publications found for all of the genes in the database.
 
 ##### Request example:
 ```json
 {
     "symbols": ["IL15RA", "APOC3"],
+    "keywords": ["aging", "lifespan"],
     "limit": 2,
     "page": 1
 }
 ```
 
-Returns a list of the publications found for all of the genes in the database.
+## Request fields: 
 
-If `symbols` array is empty, an app will create its own genes list. <br>
-If `limit` is set to `0`, an app will set it to default — `10`. <br>
+Field | Type | Required | Restrictions
+--- | --- | --- | ---
+symbols | `string[]` | optional | can be `[]`, can be `null`
+keywords | `string[]` | optional | can be `[]`, can be `null`
+limit | `number` | optional | can't be `null`
+page | `number` | optional | can't be `0`, can't be `null`
+
+If `symbols` field is missing, the app will create its own genes list. <br>
+If `keywords` field is missing, the app will use `aging` as a keyword to avoid getting irrelevant results. <br>
+Both fields can hold an empty array or `null`. <br> You can search using only keywords or only by genes list.
+
+If `limit` field is missing, the app will set it to default — `10`. <br>
 Esummary API returns error when there is no limit specified.
+
+If `page` field is missing, equals `0` or is not an integer, the app will set `page` to default — `1`.
 
 
 ##### Response example:
@@ -62,7 +69,6 @@ Esummary API returns error when there is no limit specified.
 ```
 
 ---
-
 
 **`GET` [/publication/getInfoByDOI/?doi=*DOI*](https://publications-search-api-2yf55.ondigitalocean.app/publication/getInfoByDOI/?doi=10.1093/gerona/glx257)**
 <br>query parameter `doi` takes an article DOI, example: `10.1093/gerona/glx257`
