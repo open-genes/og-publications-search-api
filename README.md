@@ -37,15 +37,16 @@ Field | Type | Required | Restrictions
 --- | --- | --- | ---
 symbols | `string[]` | optional | can be `[]`, can be `null`
 keywords | `string[]` | optional | can be `[]`, can be `null`
-limit | `number` | optional | can't be `null`
-page | `number` | optional | can't be `0`, can't be `null`
+limit | `number` | optional | if presented, can't be `null`
+page | `number` | optional | if presented, can't be `null`
 
 If `symbols` field is missing, the app will create its own genes list. <br>
 If `keywords` field is missing, the app will use `aging` as a keyword to avoid getting irrelevant results. <br>
 Both fields can hold an empty array or `null`. <br> You can search using only keywords or only by genes list.
 
-If `limit` field is missing, the app will set it to default — `10`. <br>
+If `limit` field is missing or has value of `0`, the app will set it to default — `10`. <br>
 Esummary API returns error when there is no limit specified.
+The maximum limit is `100 000` ([source](https://www.ncbi.nlm.nih.gov/books/NBK25499/)). 
 
 If `page` field is missing, equals `0` or is not an integer, the app will set `page` to default — `1`.
 

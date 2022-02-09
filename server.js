@@ -54,17 +54,22 @@ let cacheMiddleware = (duration) => {
 // App routes
 // TODO: transfer all the logic into the module
 app.post('/publication/all', cacheMiddleware(30), (req, res) => {
+    const minResultsForProcessing = 100;
+
     if (Object.keys(req.body).length !== 0) {
         const symbols = req.body.symbols !== undefined
             ? req.body.symbols :
             geneSymbolsList;
         const keywords = req.body.keywords !== undefined
             ? req.body.keywords :
-            ['aging'];
+            ['aging', 'genetics'];
         const portion = 10;
-        const limit = req.body.limit !== undefined
+
+        const limit = req.body.limit !== undefined && req.body.limit !== 0
             ? req.body.limit
             : portion;
+        const initialQuantity = limit < 100? minResultsForProcessing : limit
+
         let page = 1;
         if (req.body.page !== undefined) {
             if (!Number.isSafeInteger(page) || page === 0) {
@@ -79,12 +84,15 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
             data.forEach((data) => {
                 geneSymbolsList.push(data.symbol.toLowerCase());
             });
+
             getPublicationsIdList(
                 symbols,
                 keywords,
-                limit,
+                initialQuantity,
+                // Due to validation and exclusion of some search results,
+                // it have to request more results initially.
+                // A small response may not have relevant results.
                 (data) => {
-                    console.log(limit, page);
                     const publicationIdsList = data;
 
                     getPublicationsInIdsList(
@@ -136,15 +144,30 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                                             };
                                         }
                                     }
-                                );
+                                ).slice(0, limit);
 
-                                const startIndex = Math.ceil((page - 1) * portion);
-                                const endIndex = startIndex + portion;
+                                const pagesQuantity = filteredFeed.length < portion ? 1 : Math.ceil(filteredFeed.length / portion)
+
+                                // Count start and end indices of an array
+                                let startIndex = page === 1? 0 : Math.ceil(page * portion) - 1;
+                                let endIndex = startIndex + portion;
+                                console.log(startIndex, ':', endIndex);
+
+                                if (startIndex + portion >= filteredFeed.length) {
+                                    endIndex = filteredFeed.length;
+                                    console.log(startIndex, ':', endIndex);
+                                }
+
+                                if (page > pagesQuantity) {
+                                    const err = new Error(`There is no such page: ${page}`);
+                                    errorLogger(err);
+                                }
 
                                 try {
                                     const result = {
                                         total: filteredFeed.length,
                                         page: page,
+                                        pagesTotal: pagesQuantity,
                                         items: [...filteredFeed.slice(startIndex, endIndex)],
                                     };
                                     res.json(result);
@@ -152,10 +175,10 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                                     console.log(
                                         `\n--- New search --- \n`,
                                         `total: ${filteredFeed.length} \n`,
-                                        `symbols:${symbols} \n`,
-                                        `keywords:${keywords} \n`,
+                                        `symbols: ${symbols} \n`,
+                                        `keywords: ${keywords} \n`,
                                         `limit: ${limit} \n`,
-                                        `page: ${page} of ${Math.ceil(filteredFeed.length / portion)}`
+                                        `page: ${page} of ${pagesQuantity}`
                                     );
                                 } catch (err) {
                                     errorLogger(err);

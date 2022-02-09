@@ -1,6 +1,6 @@
 {
-  "name": "node-starter",
-  "version": "0.5.1",
+  "name": "open-genes-publications-api",
+  "version": "0.5.2",
   "private": true,
   "dependencies": {
     "axios": "^0.21.1",
