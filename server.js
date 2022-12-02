@@ -144,7 +144,7 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
                                             };
                                         }
                                     }
-                                ).slice(0, limit);
+                                ).filter((article) => article !== null && article.gene !== '').slice(0, limit);
 
                                 const pagesQuantity = filteredFeed.length < portion ? 1 : Math.ceil(filteredFeed.length / portion)
 
