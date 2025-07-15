@@ -127,7 +127,7 @@ app.post('/publication/all', cacheMiddleware(30), (req, res) => {
 
                                 // Check if gene symbol is mentioned in the title of an article.
                                 // Exclude them from response if not and add a gene symbol to response.
-                                const re = new RegExp(`${geneSymbolsList.join("|")}/gmi`);
+                                const re = new RegExp(`${symbols.join("|")}`, 'gmi');
 
                                 const filteredFeed = feed.filter(
                                     (article) => {
